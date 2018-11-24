@@ -91,6 +91,18 @@
             while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
         };
 
+        function minimum(array){
+          let min = 100000;
+          let min_ind = 0;
+          for(let i = 0; i < array.length; i++){
+            if(parseInt(array[i], 10) < min){
+              min = array[i];
+              min_ind = i;
+            }
+          }
+          return min_ind;
+        }
+
         let inwidth = window.innerWidth-window.innerWidth*.02;
         let inheight = window.innerHeight - window.innerHeight*.15;
         let renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -110,7 +122,7 @@
 
         let light = new THREE.AmbientLight(0xffffff);
         scene.add(light);
-        let light2 = new THREE.PointLight(0,0,0);
+        let light2 = new THREE.PointLight(0,5,10);
         scene.add(light2);
 
         let material = new THREE.MeshNormalMaterial();
@@ -191,8 +203,6 @@
           return new Promise(resolve => setTimeout(resolve, milliseconds))
         }
 
-        function swap(i, j){
-        };
         // 0xff0000 red
         // 0xff00ff purple
         // 0xffff00 yellow
@@ -203,6 +213,14 @@
             let min_idx = i;
             let prev_min = i;
             for(let j = i; j < cubes.length; j++){
+
+              let temp_values = [];
+              for(let k = 0; k < numbers.length; k++){
+                temp_values.push(numbers[k].value);
+              }
+              temp_values = temp_values.slice(i, j);
+              let min_ind = minimum(temp_values);
+
               if(numbers[j].value < numbers[min_idx].value){
                 prev_min = min_idx;
                 min_idx = j;
@@ -217,11 +235,7 @@
                 if(j >= i){
                   cubes[j].material.color.setHex(0xff00ff);
                 }
-                let temp_array = numbers.slice(i, j);
-                console.log(temp_array.length);
-                console.log(Math.min(temp_array));
-                //console.log(temp_array.indexOf(Math.min(temp_array))+i);
-                //cubes[temp_array.indexOf(Math.min(temp_array))+i].material.color.setHex(0xff0000);
+                cubes[min_ind+i].material.color.setHex(0xff0000);
                 render();
               });
               prev_min = min_idx;
@@ -230,7 +244,7 @@
             numbers[i] = numbers[min_idx];
             numbers[min_idx] = temp1;
 
-            sleep(7500*i + 7000).then(() => {
+            sleep(7000*i + 7000).then(() => {
               for(let k = i+1; k < cubes.length; k++){
                 cubes[k].material.color.setHex(0x2194ce);
               }
